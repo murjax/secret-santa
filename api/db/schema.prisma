@@ -20,19 +20,22 @@ enum UserStatus {
 }
 
 model User {
-  id             Int        @id @default(autoincrement())
-  email          String     @unique
-  password       String
-  firstName      String
-  lastName       String
-  avatar         String
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @default(now())
-  wishLists      WishList[]
-  santaPairings  Pairing[]  @relation("SantaPairings")
-  personPairings Pairing[]  @relation("PersonPairings")
-  fromThankYous  ThankYou[] @relation("FromThankYous")
-  toThankYous    ThankYou[] @relation("ToThankYous")
+  id                  Int        @id @default(autoincrement())
+  email               String     @unique
+  hashedPassword      String
+  salt                String
+  resetToken          String?
+  resetTokenExpiresAt DateTime?
+  firstName           String?
+  lastName            String?
+  avatar              String?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @default(now())
+  wishLists           WishList[]
+  santaPairings       Pairing[]  @relation("SantaPairings")
+  personPairings      Pairing[]  @relation("PersonPairings")
+  fromThankYous       ThankYou[] @relation("FromThankYous")
+  toThankYous         ThankYou[] @relation("ToThankYous")
 }
 
 model Event {
