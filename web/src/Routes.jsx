@@ -7,7 +7,7 @@
 // 'src/pages/HomePage/HomePage.js'         -> HomePage
 // 'src/pages/Admin/BooksPage/BooksPage.js' -> AdminBooksPage
 
-import { Router, Route } from '@redwoodjs/router'
+import { Router, Route, Private } from '@redwoodjs/router'
 
 import { useAuth } from './auth'
 
@@ -19,6 +19,10 @@ const Routes = () => {
       <Route path="/signup" page={SignupPage} name="signup" />
       <Route path="/forgot-password" page={ForgotPasswordPage} name="forgotPassword" />
       <Route path="/reset-password" page={ResetPasswordPage} name="resetPassword" />
+      <Private unauthenticated="login">
+        <Route path="/event/new" page={NewEventPage} name="newEvent" />
+        <Route path="/event/{id:Int}" page={EventPage} name="event" />
+      </Private>
       <Route notfound page={NotFoundPage} />
     </Router>
   )
