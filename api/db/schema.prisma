@@ -41,7 +41,7 @@ model User {
 model Event {
   id           Int      @id @default(autoincrement())
   name         String
-  sendReminder Boolean
+  sendReminder Boolean  @default(false)
   date         DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
