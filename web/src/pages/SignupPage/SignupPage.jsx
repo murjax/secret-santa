@@ -3,7 +3,6 @@ import { useEffect } from 'react'
 
 import {
   Form,
-  Label,
   TextField,
   PasswordField,
   FieldError,
@@ -25,14 +24,17 @@ const SignupPage = () => {
     }
   }, [isAuthenticated])
 
-  // focus on email box on page load
+  // focus on name box on page load
   const emailRef = useRef(null)
+  const nameRef = useRef(null)
+
   useEffect(() => {
-    emailRef.current?.focus()
+    nameRef.current?.focus()
   }, [])
 
   const onSubmit = async (data) => {
     const response = await signUp({
+      name: data.name,
       username: data.email,
       password: data.password,
     })
@@ -57,6 +59,21 @@ const SignupPage = () => {
           <div className="rw-form-wrapper">
             <Form onSubmit={onSubmit}>
               <TextField
+                placeholder="NAME"
+                name="name"
+                className="rw-input p-4 placeholder-black font-handwriting text-2xl"
+                errorClassName="rw-input rw-input-error"
+                ref={nameRef}
+                validation={{
+                  required: {
+                    value: true,
+                    message: 'Name is required',
+                  },
+                }}
+              />
+              <FieldError name="name" className="rw-field-error" />
+
+              <TextField
                 placeholder="EMAIL"
                 name="email"
                 className="rw-input p-4 placeholder-black font-handwriting text-2xl"
@@ -69,7 +86,6 @@ const SignupPage = () => {
                   },
                 }}
               />
-
               <FieldError name="email" className="rw-field-error" />
 
               <PasswordField
@@ -85,7 +101,6 @@ const SignupPage = () => {
                   },
                 }}
               />
-
               <FieldError name="password" className="rw-field-error" />
 
               <div className="rw-button-group">

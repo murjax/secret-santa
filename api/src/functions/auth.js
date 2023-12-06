@@ -109,7 +109,7 @@ export const handler = async (event, context) => {
           email: username,
           hashedPassword: hashedPassword,
           salt: salt,
-          // name: userAttributes.name
+          name: userAttributes.name,
         },
       })
     },
@@ -141,6 +141,7 @@ export const handler = async (event, context) => {
     // something like `id` or `userId` or even `email`)
     authFields: {
       id: 'id',
+      name: 'name',
       username: 'email',
       hashedPassword: 'hashedPassword',
       salt: 'salt',

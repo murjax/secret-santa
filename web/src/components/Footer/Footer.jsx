@@ -4,7 +4,7 @@ const Footer = () => {
       <img
         src="/images/logo__secret-santa--small.svg"
         alt="Secret Santa"
-        className="relative mx-auto mb-16"
+        className="mx-auto mb-16"
       />
 
       <p className="font-sans font-medium text-scotchMist">
