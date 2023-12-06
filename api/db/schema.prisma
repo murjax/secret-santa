@@ -19,6 +19,15 @@ enum UserStatus {
   ACCEPTED
 }
 
+model Invite {
+  id        Int      @id @default(autoincrement())
+  eventId   Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  status    UserStatus
+}
+
 model User {
   id                  Int        @id @default(autoincrement())
   email               String     @unique
@@ -32,6 +41,7 @@ model User {
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @default(now())
   wishLists           WishList[]
+  invites             Invite[]
   santaPairings       Pairing[]  @relation("SantaPairings")
   personPairings      Pairing[]  @relation("PersonPairings")
   fromThankYous       ThankYou[] @relation("FromThankYous")
@@ -48,6 +58,7 @@ model Event {
   pairings     Pairing[]
   thankYous    ThankYou[]
   wishLists    WishList[]
+  invites      Invite[]
 }
 
 model Pairing {
