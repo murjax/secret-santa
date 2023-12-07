@@ -1,10 +1,40 @@
-import { useRef, useState } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
 import { useLazyQuery } from '@apollo/client'
 import moment from 'moment'
 
-import { Form, TextField, Submit, FieldError } from '@redwoodjs/forms'
+import {
+  Label,
+  Form,
+  TextField,
+  DateField,
+  CheckboxField,
+  Submit,
+  FieldError,
+} from '@redwoodjs/forms'
 import { useMutation, useQuery } from '@redwoodjs/web'
+import { toast, Toaster } from '@redwoodjs/web/toast'
+
+export const FIND_EVENT_QUERY = gql`
+  query FindEventQuery($id: Int!) {
+    event: event(id: $id) {
+      id
+      name
+      date
+      sendReminder
+    }
+  }
+`
+
+const UPDATE_EVENT = gql`
+  mutation UpdateEventMutation($id: Int!, $input: UpdateEventInput!) {
+    updateEvent(id: $id, input: $input) {
+      id
+      date
+      sendReminder
+    }
+  }
+`
 
 const CREATE_INVITE = gql`
   mutation CreateInviteMutation($input: CreateInviteInput!) {
@@ -30,25 +60,151 @@ export const INVITES_BY_EVENT_QUERY = gql`
       user {
         id
         email
+        name
       }
     }
   }
 `
+
+const EditEventModal = ({ event, isOpen, onClose, reloadEvent }) => {
+  const nameRef = useRef(null)
+  const dateRef = useRef(null)
+  const sendReminderRef = useRef(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      nameRef.current.value = event.name
+      dateRef.current.value = moment(event.date).format('YYYY-MM-DD')
+      sendReminderRef.current.value = event.sendReminder
+    }
+  }, [event, isOpen])
+
+  const onSubmit = (data) => {
+    data.sendReminder = data.sendReminder === 'true' || data.sendReminder === true
+    updateEvent({ variables: { id: event.id, input: data } })
+  }
+
+  const [updateEvent, { loading }] = useMutation(UPDATE_EVENT, {
+    onCompleted: () => {
+      toast.success('Event updated successfully')
+      reloadEvent()
+      onClose()
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
+  if (!isOpen) {
+    return
+  }
+
+  return (
+    // Your modal content goes here
+    <div
+      className="bg-spanishGreen"
+      style={{
+        position: 'absolute',
+        width: '80%',
+        height: '100%',
+        top: 0,
+        right: 0,
+        margin: 0,
+        paddingTop: '50px',
+        paddingLeft: '50px',
+        paddingRight: '50px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+      }}
+    >
+      <div className="absolute top-0 right-0 w-6 text-2xl cursor-pointer" onClick={onClose}>
+        X
+      </div>
+      <Toaster toastOptions={{ className: 'rw-toast', duration: 6000 }} />
+      <h2 className="text-6xl text-white mt-6">EVENT DETAILS</h2>
+      <p className="text-2xl font-handwriting text-white">
+        EDIT THE CURRENT EVENT
+      </p>
+      <div className="mt-6">
+        <div className="rw-form-wrapper">
+          <Form onSubmit={onSubmit}>
+            <TextField
+              placeholder="GROUP NAME"
+              name="name"
+              className="rw-input p-4 placeholder-black font-handwriting text-2xl"
+              errorClassName="rw-input rw-input-error"
+              ref={nameRef}
+              validation={{
+                required: {
+                  value: true,
+                  message: 'Group name is required',
+                },
+              }}
+            />
+            <FieldError name="name" className="rw-field-error" />
+
+            <DateField
+              name="date"
+              className="rw-input p-4 placeholder-black font-handwriting text-2xl"
+              errorClassName="rw-input rw-input-error"
+              ref={dateRef}
+              validation={{
+                required: {
+                  value: true,
+                  message: 'Event date is required',
+                },
+              }}
+            />
+            <FieldError name="date" className="rw-field-error" />
+
+            <div className="flex items-center mb-4 mt-2">
+              <CheckboxField
+                name="sendReminder"
+                defaultChecked={false}
+                className="w-8 h-8 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                errorClassName="rw-input rw-input-error"
+                ref={sendReminderRef}
+              />
+              <Label
+                name="sendReminder"
+                className="ms-2 text-2xl font-handwriting"
+                errorClassName="rw-label rw-label-error"
+              >
+                SEND OUT A REMINDER BEFORE EVENT
+              </Label>
+            </div>
+
+            <div className="rw-button-group">
+              <Submit
+                disabled={loading}
+                className="bg-supernova w-full rounded-full text-2xl font-handwriting font-bold py-4"
+              >
+                UPDATE
+              </Submit>
+            </div>
+          </Form>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const Event = ({ event }) => {
   const nameRef = useRef(null)
   const emailRef = useRef(null)
   const [invitedUsers, setInvitedUsers] = useState([])
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [currentEvent, setCurrentEvent] = useState(event)
 
   const [createInvite, { loading }] = useMutation(CREATE_INVITE)
   const [getUserByEmail] = useLazyQuery(USER_BY_EMAIL_QUERY)
+  const [getEventById] = useLazyQuery(FIND_EVENT_QUERY)
   const invitesQuery = useQuery(INVITES_BY_EVENT_QUERY, {
-    variables: { eventId: event.id },
+    variables: { eventId: currentEvent.id },
     onCompleted: (data) => {
       setInvitedUsers(data.invites.map((invite) => invite.user))
     },
   })
-
-  function calculateWeeksAndDays(startDate) {
+  const calculateWeeksAndDays = (startDate) => {
     if (!startDate) {
       return
     }
@@ -79,19 +235,25 @@ const Event = ({ event }) => {
     return result
   }
 
-  const timeDiff = calculateWeeksAndDays(event.date)
+  const timeDiff = calculateWeeksAndDays(currentEvent.date)
 
   const onInviteSubmit = async ({ email }) => {
     const userData = await getUserByEmail({ variables: { email } })
-    createInvite({
+    await createInvite({
       variables: {
         input: {
           userId: userData.data.user.id,
-          eventId: event.id,
+          eventId: currentEvent.id,
           status: 'INVITED',
         },
       },
     })
+    invitesQuery.refetch()
+  }
+
+  const reloadEvent = async () => {
+    const result = await getEventById({ variables: { id: currentEvent.id } })
+    setCurrentEvent(result.data.event)
   }
 
   return (
@@ -99,11 +261,29 @@ const Event = ({ event }) => {
       <div className="text-3xl text-white font-handwriting">
         {timeDiff} UNTIL
       </div>
-      <h2 className="text-6xl text-white">{event.name.toUpperCase()}</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-6xl text-white">{currentEvent.name.toUpperCase()}</h2>
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          className="w-6 h-6 font-bold cursor-pointer"
+          onClick={() => setShowEditModal(true)}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+          />
+        </svg>
+      </div>
       <p className="font-handwriting text-white mt-6">
         INVITE A FRIEND OR FAMILLY MEMBER
       </p>
-      <div className="bg-spanishGreen mt-4">
+      <div className="bg-spanishGreen mt-4 max-w-[50rem]">
         <div className="rw-form-wrapper">
           <Form className="flex" onSubmit={onInviteSubmit}>
             <TextField
@@ -146,18 +326,22 @@ const Event = ({ event }) => {
         </div>
       </div>
 
-      <div className="mt-6 mb-6">
+      <div className="flex flex-wrap mt-6 mb-6 max-w-[50rem]">
         {invitedUsers.map((invitedUser) => {
           return (
-            <div
-              className="bg-white p-4 m-2 font-bold text-2xl"
-              key={invitedUser.id}
-            >
-              {invitedUser.email}
+            <div className="bg-white p-4 m-2 w-2/5" key={invitedUser.id}>
+              <p className="text-2xl font-bold">{invitedUser.name}</p>
+              <p>{invitedUser.email}</p>
             </div>
           )
         })}
       </div>
+      <EditEventModal
+        event={currentEvent}
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        reloadEvent={reloadEvent}
+      />
     </article>
   )
 }

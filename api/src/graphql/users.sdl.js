@@ -6,8 +6,7 @@ export const schema = gql`
     salt: String!
     resetToken: String
     resetTokenExpiresAt: DateTime
-    firstName: String
-    lastName: String
+    name: String
     avatar: String
     createdAt: DateTime!
     updatedAt: DateTime!
@@ -26,8 +25,7 @@ export const schema = gql`
     salt: String!
     resetToken: String
     resetTokenExpiresAt: DateTime
-    firstName: String
-    lastName: String
+    name: String
     avatar: String
   }
 
@@ -37,8 +35,7 @@ export const schema = gql`
     salt: String
     resetToken: String
     resetTokenExpiresAt: DateTime
-    firstName: String
-    lastName: String
+    name: String
     avatar: String
   }
 
