@@ -66,6 +66,14 @@ export const INVITES_BY_EVENT_QUERY = gql`
   }
 `
 
+const EMAIL_INVITE_MUTATION = gql`
+  mutation EmailInviteMutation($inviteId: Int!, $userId: Int!) {
+    emailInvite(inviteId: $inviteId, userId: $userId) {
+      id
+    }
+  }
+`
+
 const EditEventModal = ({ event, isOpen, onClose, reloadEvent }) => {
   const nameRef = useRef(null)
   const dateRef = useRef(null)
@@ -204,6 +212,16 @@ const Event = ({ event }) => {
       setInvitedUsers(data.invites.map((invite) => invite.user))
     },
   })
+  const [emailInvite] = useMutation(EMAIL_INVITE_MUTATION, {
+    onCompleted: () => {
+      toast.success('Email sent')
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
+
   const calculateWeeksAndDays = (startDate) => {
     if (!startDate) {
       return
@@ -239,13 +257,19 @@ const Event = ({ event }) => {
 
   const onInviteSubmit = async ({ email }) => {
     const userData = await getUserByEmail({ variables: { email } })
-    await createInvite({
+    const inviteData = await createInvite({
       variables: {
         input: {
           userId: userData.data.user.id,
           eventId: currentEvent.id,
           status: 'INVITED',
         },
+      },
+    })
+    emailInvite({
+      variables: {
+        inviteId: inviteData.data.createInvite.id,
+        userId: userData.data.user.id,
       },
     })
     invitesQuery.refetch()
@@ -262,7 +286,9 @@ const Event = ({ event }) => {
         {timeDiff} UNTIL
       </div>
       <div className="flex justify-between items-center">
-        <h2 className="text-6xl text-white">{currentEvent.name.toUpperCase()}</h2>
+        <h2 className="text-6xl text-white">
+          {currentEvent.name.toUpperCase()}
+        </h2>
 
         <svg
           xmlns="http://www.w3.org/2000/svg"
