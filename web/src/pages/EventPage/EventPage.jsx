@@ -9,7 +9,7 @@ const EventPage = ({ id }) => {
       <MetaTags title="Event" description="Event page" />
 
       <main className="bg-interior bg-no-repeat bg-turquoiseGreen">
-        <div className="flex">
+        <div className="flex pb-80">
           <img
             src="/images/logo__secret-santa.svg"
             alt="Secret Santa"

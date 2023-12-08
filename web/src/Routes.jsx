@@ -19,6 +19,7 @@ const Routes = () => {
       <Route path="/signup" page={SignupPage} name="signup" />
       <Route path="/forgot-password" page={ForgotPasswordPage} name="forgotPassword" />
       <Route path="/reset-password" page={ResetPasswordPage} name="resetPassword" />
+      <Route path="/invite/{id:Int}" page={InvitePage} name="invite" />
       <Private unauthenticated="login">
         <Route path="/event/new" page={NewEventPage} name="newEvent" />
         <Route path="/event/{id:Int}" page={EventPage} name="event" />

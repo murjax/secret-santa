@@ -44,31 +44,19 @@ const CREATE_INVITE = gql`
   }
 `
 
-export const USER_BY_EMAIL_QUERY = gql`
-  query FindUserByEmailQuery($email: String!) {
-    user: userByEmail(email: $email) {
+export const INVITES_BY_EVENT_QUERY = gql`
+  query GetInvitesByEventQuery($eventId: Int!) {
+    invites: invitesByEvent(eventId: $eventId) {
       id
+      name
       email
     }
   }
 `
 
-export const INVITES_BY_EVENT_QUERY = gql`
-  query GetInvitesByEventQuery($eventId: Int!) {
-    invites: invitesByEvent(eventId: $eventId) {
-      id
-      user {
-        id
-        email
-        name
-      }
-    }
-  }
-`
-
 const EMAIL_INVITE_MUTATION = gql`
-  mutation EmailInviteMutation($inviteId: Int!, $userId: Int!) {
-    emailInvite(inviteId: $inviteId, userId: $userId) {
+  mutation EmailInviteMutation($id: Int!) {
+    emailInvite(id: $id) {
       id
     }
   }
@@ -199,17 +187,16 @@ const EditEventModal = ({ event, isOpen, onClose, reloadEvent }) => {
 const Event = ({ event }) => {
   const nameRef = useRef(null)
   const emailRef = useRef(null)
-  const [invitedUsers, setInvitedUsers] = useState([])
+  const [invites, setInvites] = useState([])
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentEvent, setCurrentEvent] = useState(event)
 
   const [createInvite, { loading }] = useMutation(CREATE_INVITE)
-  const [getUserByEmail] = useLazyQuery(USER_BY_EMAIL_QUERY)
   const [getEventById] = useLazyQuery(FIND_EVENT_QUERY)
   const invitesQuery = useQuery(INVITES_BY_EVENT_QUERY, {
     variables: { eventId: currentEvent.id },
     onCompleted: (data) => {
-      setInvitedUsers(data.invites.map((invite) => invite.user))
+      setInvites(data.invites)
     },
   })
   const [emailInvite] = useMutation(EMAIL_INVITE_MUTATION, {
@@ -220,7 +207,6 @@ const Event = ({ event }) => {
       toast.error(error.message)
     },
   })
-
 
   const calculateWeeksAndDays = (startDate) => {
     if (!startDate) {
@@ -255,12 +241,12 @@ const Event = ({ event }) => {
 
   const timeDiff = calculateWeeksAndDays(currentEvent.date)
 
-  const onInviteSubmit = async ({ email }) => {
-    const userData = await getUserByEmail({ variables: { email } })
+  const onInviteSubmit = async ({ name, email }) => {
     const inviteData = await createInvite({
       variables: {
         input: {
-          userId: userData.data.user.id,
+          name,
+          email,
           eventId: currentEvent.id,
           status: 'INVITED',
         },
@@ -268,8 +254,7 @@ const Event = ({ event }) => {
     })
     emailInvite({
       variables: {
-        inviteId: inviteData.data.createInvite.id,
-        userId: userData.data.user.id,
+        id: inviteData.data.createInvite.id,
       },
     })
     invitesQuery.refetch()
@@ -353,11 +338,11 @@ const Event = ({ event }) => {
       </div>
 
       <div className="flex flex-wrap mt-6 mb-6 max-w-[50rem]">
-        {invitedUsers.map((invitedUser) => {
+        {invites.map((invite) => {
           return (
-            <div className="bg-white p-4 m-2 w-2/5" key={invitedUser.id}>
-              <p className="text-2xl font-bold">{invitedUser.name}</p>
-              <p>{invitedUser.email}</p>
+            <div className="bg-white p-4 m-2 w-2/5" key={invite.id}>
+              <p className="text-2xl font-bold">{invite.name}</p>
+              <p>{invite.email}</p>
             </div>
           )
         })}

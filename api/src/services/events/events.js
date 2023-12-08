@@ -12,7 +12,7 @@ export const event = ({ id }) => {
 
 export const createEvent = ({ input }) => {
   return db.event.create({
-    data: input,
+    data: { ...input, ownerId: context.currentUser.id },
   })
 }
 
