@@ -36,5 +36,6 @@ export const schema = gql`
     createInvite(input: CreateInviteInput!): Invite! @requireAuth
     updateInvite(id: Int!, input: UpdateInviteInput!): Invite! @requireAuth
     deleteInvite(id: Int!): Invite! @requireAuth
+    emailInvite(inviteId: Int!, userId: Int!): Invite! @requireAuth
   }
 `
