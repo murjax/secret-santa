@@ -3,8 +3,10 @@ export const schema = gql`
     id: Int!
     eventId: Int!
     event: Event!
-    userId: Int!
-    user: User!
+    name: String!
+    email: String!
+    userId: Int
+    user: User
     status: UserStatus!
   }
 
@@ -16,13 +18,14 @@ export const schema = gql`
 
   type Query {
     invites: [Invite!]! @requireAuth
-    invite(id: Int!): Invite @requireAuth
+    invite(id: Int!): Invite @skipAuth
     invitesByEvent(eventId: Int!): [Invite!]! @requireAuth
   }
 
   input CreateInviteInput {
     eventId: Int!
-    userId: Int!
+    name: String!
+    email: String!
     status: UserStatus!
   }
 
@@ -34,8 +37,8 @@ export const schema = gql`
 
   type Mutation {
     createInvite(input: CreateInviteInput!): Invite! @requireAuth
-    updateInvite(id: Int!, input: UpdateInviteInput!): Invite! @requireAuth
+    updateInvite(id: Int!, input: UpdateInviteInput!): Invite! @skipAuth
     deleteInvite(id: Int!): Invite! @requireAuth
-    emailInvite(inviteId: Int!, userId: Int!): Invite! @requireAuth
+    emailInvite(id: Int!): Invite! @requireAuth
   }
 `

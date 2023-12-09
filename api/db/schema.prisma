@@ -20,11 +20,13 @@ enum UserStatus {
 }
 
 model Invite {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   eventId   Int
-  event     Event    @relation(fields: [eventId], references: [id])
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  event     Event      @relation(fields: [eventId], references: [id])
+  name      String
+  email     String
+  userId    Int?
+  user      User?      @relation(fields: [userId], references: [id])
   status    UserStatus
 }
 
@@ -41,6 +43,7 @@ model User {
   updatedAt           DateTime   @default(now())
   wishLists           WishList[]
   invites             Invite[]
+  events              Event[]    @relation("Owners")
   santaPairings       Pairing[]  @relation("SantaPairings")
   personPairings      Pairing[]  @relation("PersonPairings")
   fromThankYous       ThankYou[] @relation("FromThankYous")
@@ -48,12 +51,14 @@ model User {
 }
 
 model Event {
-  id           Int      @id @default(autoincrement())
+  id           Int        @id @default(autoincrement())
   name         String
-  sendReminder Boolean  @default(false)
+  sendReminder Boolean    @default(false)
   date         DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now())
+  ownerId      Int
+  owner        User       @relation("Owners", fields: [ownerId], references: [id])
   pairings     Pairing[]
   thankYous    ThankYou[]
   wishLists    WishList[]

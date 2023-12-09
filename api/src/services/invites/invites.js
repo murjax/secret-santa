@@ -38,15 +38,15 @@ export const deleteInvite = ({ id }) => {
   })
 }
 
-export const emailInvite = async ({ inviteId, userId }) => {
+export const emailInvite = async ({ id }) => {
   const invite = await db.invite.findUnique({
-    where: { id: inviteId },
-  })
-  const user = await db.user.findUnique({
-    where: { id: userId },
+    where: { id },
   })
   const event = await db.event.findUnique({
     where: { id: invite.eventId },
+  })
+  const owner = await db.user.findUnique({
+    where: { id: event.ownerId },
   })
 
   const transporter = nodemailer.createTransport({
@@ -69,14 +69,16 @@ export const emailInvite = async ({ inviteId, userId }) => {
   )
 
   await transporter.sendMail({
-    from: 'owner@example.com',
-    to: user.email,
+    from: owner.email,
+    to: invite.email,
     subject: "Jingle all the way! You're invited to a Secret Santa Celebration",
     template: 'invite',
     context: {
-      name: user.name,
+      name: invite.name,
       eventName: event.name,
       eventDate: moment(event.date).format('MM/DD/YYYY'),
+      inviteUrl: `http://localhost:8910/invite/${id}`,
+      ownerName: owner.name,
     },
     attachments: [
       {
