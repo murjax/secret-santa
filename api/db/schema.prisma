@@ -95,10 +95,10 @@ model WishList {
   url             String
   siteImage       String
   siteTitle       String
-  SiteDescription String
-  order           Int
-  eventId         Int
-  event           Event    @relation(fields: [eventId], references: [id])
+  siteDescription String
+  order           Int?
+  eventId         Int?
+  event           Event?   @relation(fields: [eventId], references: [id])
   userId          Int
   user            User     @relation(fields: [userId], references: [id])
   createdAt       DateTime @default(now())

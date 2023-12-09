@@ -96,7 +96,6 @@ const EditEventModal = ({ event, isOpen, onClose, reloadEvent }) => {
   }
 
   return (
-    // Your modal content goes here
     <div
       className="bg-spanishGreen"
       style={{

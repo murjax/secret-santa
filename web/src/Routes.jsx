@@ -23,6 +23,7 @@ const Routes = () => {
       <Private unauthenticated="login">
         <Route path="/event/new" page={NewEventPage} name="newEvent" />
         <Route path="/event/{id:Int}" page={EventPage} name="event" />
+        <Route path="/user/{id:Int}/wish-list" page={UserWishListPage} name="userWishList" />
       </Private>
       <Route notfound page={NotFoundPage} />
     </Router>
