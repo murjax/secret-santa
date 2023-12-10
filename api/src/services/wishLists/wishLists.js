@@ -16,7 +16,7 @@ export const wishList = ({ id }) => {
 
 export const createWishList = ({ input }) => {
   return db.wishList.create({
-    data: input,
+    data: { ...input, userId: context.currentUser.id },
   })
 }
 

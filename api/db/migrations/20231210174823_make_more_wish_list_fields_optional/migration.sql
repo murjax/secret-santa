@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "WishList" ALTER COLUMN "siteImage" DROP NOT NULL,
+ALTER COLUMN "siteTitle" DROP NOT NULL,
+ALTER COLUMN "siteDescription" DROP NOT NULL;

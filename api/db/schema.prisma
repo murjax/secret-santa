@@ -93,9 +93,9 @@ model WishList {
   id              Int      @id @default(autoincrement())
   name            String
   url             String
-  siteImage       String
-  siteTitle       String
-  siteDescription String
+  siteImage       String?
+  siteTitle       String?
+  siteDescription String?
   order           Int?
   eventId         Int?
   event           Event?   @relation(fields: [eventId], references: [id])
