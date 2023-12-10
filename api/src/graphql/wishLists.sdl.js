@@ -24,12 +24,12 @@ export const schema = gql`
   input CreateWishListInput {
     name: String!
     url: String!
-    siteImage: String!
-    siteTitle: String!
-    siteDescription: String!
-    order: Int!
-    eventId: Int!
-    userId: Int!
+    siteImage: String
+    siteTitle: String
+    siteDescription: String
+    order: Int
+    eventId: Int
+    userId: Int
   }
 
   input UpdateWishListInput {
