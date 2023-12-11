@@ -8,6 +8,10 @@ export const wishListsByUser = ({ userId }) => {
   return db.wishList.findMany({ where: { userId } })
 }
 
+export const wishListsByCurrentUser = () => {
+  return db.wishList.findMany({ where: { userId: context.currentUser.id } })
+}
+
 export const wishList = ({ id }) => {
   return db.wishList.findUnique({
     where: { id },
@@ -30,6 +34,12 @@ export const updateWishList = ({ id, input }) => {
 export const deleteWishList = ({ id }) => {
   return db.wishList.delete({
     where: { id },
+  })
+}
+
+export const deleteWishListsByCurrentUser = () => {
+  return db.wishList.deleteMany({
+    where: { userId: context.currentUser.id },
   })
 }
 
