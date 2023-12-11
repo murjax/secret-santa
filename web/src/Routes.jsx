@@ -25,6 +25,7 @@ const Routes = () => {
         <Route path="/event/{id:Int}" page={EventPage} name="event" />
         <Route path="/user/{id:Int}/wish-list" page={UserWishListPage} name="userWishList" />
         <Route path="/wish-list/new" page={NewWishListPage} name="newWishList" />
+        <Route path="/wish-list/edit" page={EditWishListPage} name="editWishList" />
       </Private>
       <Route notfound page={NotFoundPage} />
     </Router>

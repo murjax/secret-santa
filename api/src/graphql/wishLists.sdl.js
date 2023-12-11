@@ -1,11 +1,11 @@
 export const schema = gql`
   type WishList {
-    id: Int!
+    id: Int
     name: String!
     url: String!
-    siteImage: String!
-    siteTitle: String!
-    siteDescription: String!
+    siteImage: String
+    siteTitle: String
+    siteDescription: String
     order: Int
     eventId: Int
     event: Event
@@ -18,6 +18,7 @@ export const schema = gql`
   type Query {
     wishLists: [WishList!]! @requireAuth
     wishListsByUser(userId: Int!): [WishList!] @requireAuth
+    wishListsByCurrentUser: [WishList!] @requireAuth
     wishList(id: Int!): WishList @requireAuth
   }
 
@@ -48,5 +49,6 @@ export const schema = gql`
     updateWishList(id: Int!, input: UpdateWishListInput!): WishList!
       @requireAuth
     deleteWishList(id: Int!): WishList! @requireAuth
+    deleteWishListsByCurrentUser: WishList @requireAuth
   }
 `
