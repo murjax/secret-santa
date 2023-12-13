@@ -4,6 +4,15 @@ export const events = () => {
   return db.event.findMany()
 }
 
+export const currentUserEvents = () => {
+  return db.event.findMany({
+    where: { ownerId: context.currentUser.id },
+    include: {
+      invites: true,
+    },
+  })
+}
+
 export const event = ({ id }) => {
   return db.event.findUnique({
     where: { id },

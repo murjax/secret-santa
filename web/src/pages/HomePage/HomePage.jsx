@@ -1,19 +1,24 @@
-import { Link, routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
+
+import DashboardCell from 'src/components/DashboardCell'
+import Footer from 'src/components/Footer/Footer'
 
 const HomePage = () => {
   return (
     <>
       <MetaTags title="Home" description="Home page" />
 
-      <h1>HomePage</h1>
-      <p>
-        Find me in <code>./web/src/pages/HomePage/HomePage.jsx</code>
-      </p>
-      <p>
-        My default route is named <code>home</code>, link to me with `
-        <Link to={routes.home()}>Home</Link>`
-      </p>
+      <main className="bg-interior bg-no-repeat bg-turquoiseGreen">
+        <div className="flex pb-80">
+          <img
+            src="/images/logo__secret-santa.svg"
+            alt="Secret Santa"
+            className="mb-10 ml-4 mr-20 w-[360px] pt-16"
+          />
+          <DashboardCell />
+        </div>
+        <Footer />
+      </main>
     </>
   )
 }
