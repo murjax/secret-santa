@@ -9,6 +9,7 @@ export const currentUserEvents = () => {
     where: { ownerId: context.currentUser.id },
     include: {
       invites: true,
+      pairings: true,
     },
   })
 }
