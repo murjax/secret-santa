@@ -7,6 +7,7 @@ export const schema = gql`
     createdAt: DateTime!
     updatedAt: DateTime!
     invites: [Invite]
+    pairings: [Pairing]
   }
 
   type Query {
