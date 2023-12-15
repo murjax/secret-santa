@@ -19,7 +19,7 @@ export const schema = gql`
   type Query {
     invites: [Invite!]! @requireAuth
     invite(id: Int!): Invite @skipAuth
-    invitesByEvent(eventId: Int!): [Invite!]! @requireAuth
+    invitesByEvent(eventId: Int!): [Invite!]! @skipAuth
   }
 
   input CreateInviteInput {

@@ -10,7 +10,10 @@ export const invites = () => {
 }
 
 export const invitesByEvent = ({ eventId }) => {
-  return db.invite.findMany({ where: { eventId } })
+  return db.invite.findMany({
+    where: { eventId },
+    include: { user: true },
+  })
 }
 
 export const invite = ({ id }) => {

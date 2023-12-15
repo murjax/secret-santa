@@ -30,8 +30,9 @@ export const schema = gql`
   }
 
   type Mutation {
-    createPairing(input: CreatePairingInput!): Pairing! @requireAuth
+    createPairing(input: CreatePairingInput!): Pairing! @skipAuth
     updatePairing(id: Int!, input: UpdatePairingInput!): Pairing! @requireAuth
     deletePairing(id: Int!): Pairing! @requireAuth
+    emailPairing(id: Int!): Pairing! @skipAuth
   }
 `
