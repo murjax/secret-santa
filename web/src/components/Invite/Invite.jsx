@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { useLazyQuery } from '@apollo/client'
 import moment from 'moment'
 
 import { Form, PasswordField, Submit, FieldError } from '@redwoodjs/forms'
@@ -16,10 +17,61 @@ const UPDATE_INVITE = gql`
     }
   }
 `
+export const INVITES_BY_EVENT_QUERY = gql`
+  query GetInvitesByEventQuery($eventId: Int!) {
+    invites: invitesByEvent(eventId: $eventId) {
+      id
+      name
+      email
+      status
+      user {
+        id
+      }
+    }
+  }
+`
+
+export const PAIRINGS_BY_EVENT_QUERY = gql`
+  query GetPairingsByEventQuery($eventId: Int!) {
+    pairings: pairingsByEvent(eventId: $eventId) {
+      id
+      santa {
+        id
+        name
+        email
+      }
+      person {
+        id
+        name
+        email
+      }
+    }
+  }
+`
+
+const CREATE_PAIRING = gql`
+  mutation CreatePairingMutation($input: CreatePairingInput!) {
+    createPairing(input: $input) {
+      id
+    }
+  }
+`
+
+const EMAIL_PAIRING_MUTATION = gql`
+  mutation EmailPairingMutation($id: Int!) {
+    emailPairing(id: $id) {
+      id
+    }
+  }
+`
 
 const Invite = ({ invite }) => {
   const [inviteStatus, setInviteStatus] = useState(null)
   const [updateInvite] = useMutation(UPDATE_INVITE)
+  const [createPairing] = useMutation(CREATE_PAIRING)
+  const [emailPairing] = useMutation(EMAIL_PAIRING_MUTATION)
+  const [invitesByEventQuery] = useLazyQuery(INVITES_BY_EVENT_QUERY)
+  const [getPairingsByEventId] = useLazyQuery(PAIRINGS_BY_EVENT_QUERY)
   const declineInvite = () => {
     updateInvite({
       variables: {
@@ -45,14 +97,84 @@ const Invite = ({ invite }) => {
       username: invite.email,
       password: data.password,
     })
-    updateInvite({
+    await updateInvite({
       variables: {
         id: invite.id,
         input: { userId: response.id },
       },
     })
 
+    await processPairings()
+
     navigate(routes.home())
+  }
+
+  const processPairings = async () => {
+    const result = await invitesByEventQuery({
+      variables: { eventId: invite.event.id },
+    })
+    const invites = result.data.invites
+    const allResponded = invites.every((invite) => invite.status != 'INVITED')
+    if (!allResponded) {
+      return
+    }
+
+    const acceptedInvites = invites.filter(
+      (invite) => invite.status == 'ACCEPTED'
+    )
+    const pairableInvites = acceptedInvites.slice(0)
+    shuffleArray(pairableInvites)
+    const pairedInvites = groupIntoSets(pairableInvites, 2)
+    await createPairings(pairedInvites)
+    const pairingData = await getPairingsByEventId({
+      variables: { eventId: invite.event.id },
+    })
+    await sendSantaEmails(pairingData.data.pairings)
+  }
+
+  const sendSantaEmails = async (pairings) => {
+    pairings.forEach((pairing) => {
+      emailPairing({
+        variables: {
+          id: pairing.id,
+        },
+      })
+    })
+  }
+
+  const createPairings = async (pairedInvites) => {
+    const promises = pairedInvites.map((item) => {
+      return createPairing({
+        variables: {
+          input: {
+            eventId: invite.event.id,
+            santaId: item[0].user.id,
+            personId: item[1].user.id,
+          },
+        },
+      })
+    })
+
+    return Promise.all(promises)
+  }
+
+  const shuffleArray = (array) => {
+    for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1))
+      var temp = array[i]
+      array[i] = array[j]
+      array[j] = temp
+    }
+  }
+
+  const groupIntoSets = (array, setSize) => {
+    const result = []
+
+    for (let i = 0; i < array.length; i += setSize) {
+      result.push(array.slice(i, i + setSize))
+    }
+
+    return result
   }
 
   if (inviteStatus === 'ACCEPTED') {
