@@ -13,6 +13,15 @@ export const pairingsByEvent = ({ eventId }) => {
   return db.pairing.findMany({ where: { eventId } })
 }
 
+export const currentUserPairings = () => {
+  return db.pairing.findMany({
+    where: { personId: context.currentUser.id },
+    include: {
+      santa: true,
+    },
+  })
+}
+
 export const pairing = ({ id }) => {
   return db.pairing.findUnique({
     where: { id },

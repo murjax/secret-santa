@@ -15,6 +15,7 @@ export const schema = gql`
     pairings: [Pairing!]! @requireAuth
     pairing(id: Int!): Pairing @requireAuth
     pairingsByEvent(eventId: Int!): [Pairing!]! @requireAuth
+    currentUserPairings: [Pairing!]! @requireAuth
   }
 
   input CreatePairingInput {
