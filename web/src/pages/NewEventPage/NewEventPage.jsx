@@ -23,7 +23,7 @@ const CREATE_EVENT = gql`
   }
 `
 
-const NewEventPage = () => {
+const NewEventPage = ({ eventPassed }) => {
   const nameRef = useRef(null)
   const dateRef = useRef(null)
 
@@ -44,6 +44,23 @@ const NewEventPage = () => {
     create({ variables: { input: data } })
   }
 
+  const formTitle = () => {
+    if (eventPassed) {
+      return (
+        <>
+          <p className="text-3xl text-white">
+            YOUR EVENT HAS PAST, BUT YOU CAN
+          </p>
+          <p className="text-5xl text-white">SET UP A NEW EVENT</p>
+        </>
+      )
+    }
+
+    return (
+      <p className="text-4xl text-white">- SET UP YOUR GROUP -</p>
+    )
+  }
+
   return (
     <>
       <MetaTags title="NewEvent" description="NewEvent page" />
@@ -55,9 +72,9 @@ const NewEventPage = () => {
           alt="Secret Santa"
           className="mx-auto mb-10 w-[460px] pt-16"
         />
-        <div className="rw-login-container w-2/5">
+        <div className="rw-login-container w-1/2">
           <div className="rw-form-wrapper">
-            <p className="text-4xl text-white">- SET UP YOUR GROUP -</p>
+            {formTitle()}
             <Form onSubmit={onSubmit}>
               <TextField
                 placeholder="GROUP NAME"

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 
 import moment from 'moment'
 
+import { navigate, routes } from '@redwoodjs/router'
+
 export const QUERY = gql`
   query CurrentUserEventsQuery {
     currentUserEvents {
@@ -31,6 +33,17 @@ export const Success = ({ currentUserEvents }) => {
   const [filteredInvites, setFilteredInvites] = useState([])
 
   const currentEvent = currentUserEvents[currentUserEvents.length - 1]
+
+  useEffect(() => {
+    const startDate = moment(currentEvent.date)
+    const endDate = moment()
+    const duration = moment.duration(startDate.diff(endDate))
+    const days = duration.days()
+
+    if (days < 0) {
+      navigate(routes.newEvent({ eventPassed: true }))
+    }
+  }, [currentEvent.date])
 
   useEffect(() => {
     if (statusFilter) {
