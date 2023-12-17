@@ -12,6 +12,7 @@ import {
   Submit,
   FieldError,
 } from '@redwoodjs/forms'
+import { navigate, routes } from '@redwoodjs/router'
 import { useMutation, useQuery } from '@redwoodjs/web'
 import { toast, Toaster } from '@redwoodjs/web/toast'
 
@@ -206,6 +207,17 @@ const Event = ({ event }) => {
       toast.error(error.message)
     },
   })
+
+  useEffect(() => {
+    const startDate = moment(event.date)
+    const endDate = moment()
+    const duration = moment.duration(startDate.diff(endDate))
+    const days = duration.days()
+
+    if (days < 0) {
+      navigate(routes.newEvent({ eventPassed: true }))
+    }
+  }, [event])
 
   const calculateWeeksAndDays = (startDate) => {
     if (!startDate) {
