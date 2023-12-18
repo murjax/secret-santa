@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import moment from 'moment'
 
-import { navigate, routes } from '@redwoodjs/router'
+import { Link, navigate, routes } from '@redwoodjs/router'
 
 export const QUERY = gql`
   query CurrentUserEventsQuery {
@@ -31,6 +31,7 @@ export const Failure = ({ error }) => (
 export const Success = ({ currentUserEvents }) => {
   const [statusFilter, setStatusFilter] = useState(null)
   const [filteredInvites, setFilteredInvites] = useState([])
+  const [showMenu, setShowMenu] = useState(false)
 
   const currentEvent = currentUserEvents[currentUserEvents.length - 1]
 
@@ -180,8 +181,91 @@ export const Success = ({ currentUserEvents }) => {
     return otherFilterSelected ? `${baseClass} opacity-50` : baseClass
   }
 
+  const menuButton = () => {
+    return (
+      <button
+        className="absolute bg-supernova top-5 left-5 cursor-pointer"
+        onClick={() => setShowMenu(true)}
+      >
+        <svg
+          width="50px"
+          height="50px"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M4 18L20 18"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M4 12L20 12"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M4 6L20 6"
+            stroke="#000000"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
+    )
+  }
+
+  const sideMenu = () => {
+    if (!showMenu) {
+      return
+    }
+
+    return (
+      <div className="absolute top-0 bottom-0 left-0 right-2/3 bg-supernova">
+        <button className="text-5xl p-5" onClick={() => setShowMenu(false)}>
+          X
+        </button>
+        <div>
+          <div className="text-5xl p-5">
+            <p className="p-2">DASHBOARD</p>
+            <Link
+              to={routes.event({ id: currentEvent.id })}
+              className="block p-2"
+            >
+              OUR EVENT
+            </Link>
+            <Link to={routes.editWishList()} className="block p-2">
+              MY WISH LIST
+            </Link>
+          </div>
+          <div className="px-8 mt-10">
+            <h2 className="text-3xl text-spanishGreen">PAST EVENTS</h2>
+            {currentUserEvents.map((event) => {
+              if (event.id == currentEvent.id) {
+                return
+              }
+
+              return (
+                <div key={event.id}>
+                  <p className="text-2xl font-bold mt-2">{event.name}</p>
+                  <p className="text-xl">
+                    {moment(event.date).format('MMMM Do, YYYY')}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <article className="pt-20 p-4 w-full">
+      {menuButton()}
+      {sideMenu()}
       <div className="text-3xl text-white font-handwriting">
         {timeDiff} UNTIL
       </div>
