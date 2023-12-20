@@ -27,6 +27,16 @@ export const FIND_EVENT_QUERY = gql`
   }
 `
 
+export const FIND_CURRENT_USER_QUERY = gql`
+  query FindCurrentUserQuery {
+    currentUser {
+      id
+      name
+      email
+    }
+  }
+`
+
 const UPDATE_EVENT = gql`
   mutation UpdateEventMutation($id: Int!, $input: UpdateEventInput!) {
     updateEvent(id: $id, input: $input) {
@@ -188,11 +198,18 @@ const Event = ({ event }) => {
   const nameRef = useRef(null)
   const emailRef = useRef(null)
   const [invites, setInvites] = useState([])
+  const [currentUser, setCurrentUser] = useState(null)
+  const [adminView, setAdminView] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentEvent, setCurrentEvent] = useState(event)
 
   const [createInvite, { loading }] = useMutation(CREATE_INVITE)
   const [getEventById] = useLazyQuery(FIND_EVENT_QUERY)
+
+  useQuery(FIND_CURRENT_USER_QUERY, {
+    onCompleted: (data) => setCurrentUser(data.currentUser),
+  })
+
   const invitesQuery = useQuery(INVITES_BY_EVENT_QUERY, {
     variables: { eventId: currentEvent.id },
     onCompleted: (data) => {
@@ -218,6 +235,12 @@ const Event = ({ event }) => {
       navigate(routes.newEvent({ eventPassed: true }))
     }
   }, [event])
+
+  useEffect(() => {
+    if (currentUser?.id == event.ownerId) {
+      setAdminView(true)
+    }
+  }, [event, currentUser])
 
   const calculateWeeksAndDays = (startDate) => {
     if (!startDate) {
@@ -286,21 +309,23 @@ const Event = ({ event }) => {
           {currentEvent.name.toUpperCase()}
         </h2>
 
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-6 h-6 font-bold cursor-pointer"
-          onClick={() => setShowEditModal(true)}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-          />
-        </svg>
+        {adminView && (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-6 h-6 font-bold cursor-pointer"
+            onClick={() => setShowEditModal(true)}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+            />
+          </svg>
+        )}
       </div>
       <p className="font-handwriting text-white mt-6">
         INVITE A FRIEND OR FAMILLY MEMBER

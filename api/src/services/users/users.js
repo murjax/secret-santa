@@ -10,6 +10,12 @@ export const user = ({ id }) => {
   })
 }
 
+export const currentUser = () => {
+  return db.user.findUnique({
+    where: { id: context.currentUser.id },
+  })
+}
+
 export const userByEmail = ({ email }) => {
   return db.user.findUnique({
     where: { email },
