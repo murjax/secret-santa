@@ -7,6 +7,7 @@ export const QUERY = gql`
       name
       date
       sendReminder
+      ownerId
     }
   }
 `

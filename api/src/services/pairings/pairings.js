@@ -22,6 +22,24 @@ export const currentUserPairings = () => {
   })
 }
 
+export const currentUserSantaPairings = () => {
+  return db.pairing.findMany({
+    where: { santaId: context.currentUser.id },
+    include: {
+      santa: true,
+    },
+  })
+}
+
+export const currentUserPersonPairings = () => {
+  return db.pairing.findMany({
+    where: { personId: context.currentUser.id },
+    include: {
+      person: true,
+    },
+  })
+}
+
 export const pairing = ({ id }) => {
   return db.pairing.findUnique({
     where: { id },

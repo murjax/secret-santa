@@ -17,6 +17,7 @@ export const schema = gql`
     users: [User!]! @requireAuth
     user(id: Int!): User @requireAuth
     userByEmail(email: String!): User @requireAuth
+    currentUser: User @requireAuth
   }
 
   input CreateUserInput {
