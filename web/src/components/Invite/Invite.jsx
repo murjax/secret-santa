@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import { useLazyQuery } from '@apollo/client'
 import moment from 'moment'
@@ -72,6 +72,8 @@ const Invite = ({ invite }) => {
   const [emailPairing] = useMutation(EMAIL_PAIRING_MUTATION)
   const [invitesByEventQuery] = useLazyQuery(INVITES_BY_EVENT_QUERY)
   const [getPairingsByEventId] = useLazyQuery(PAIRINGS_BY_EVENT_QUERY)
+  const [file, setFile] = useState()
+  const fileRef = useRef(null)
   const declineInvite = () => {
     updateInvite({
       variables: {
@@ -91,11 +93,17 @@ const Invite = ({ invite }) => {
     setInviteStatus('ACCEPTED')
   }
   const { signUp } = useAuth()
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0])
+  }
   const onSignUpSubmit = async (data) => {
+    const base64Avatar = await getBase64(file)
+
     const response = await signUp({
       name: invite.name,
       username: invite.email,
       password: data.password,
+      avatar: base64Avatar,
     })
     await updateInvite({
       variables: {
@@ -107,6 +115,15 @@ const Invite = ({ invite }) => {
     await processPairings()
 
     navigate(routes.home())
+  }
+
+  const getBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = (error) => reject(error)
+    })
   }
 
   const processPairings = async () => {
@@ -199,6 +216,31 @@ const Invite = ({ invite }) => {
             />
 
             <FieldError name="password" className="rw-field-error" />
+
+            <div className="max-w-xl mt-4">
+              <label
+                className="flex justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none">
+                <span className="flex items-center space-x-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                  </svg>
+                  <span className="font-medium text-gray-600">
+                    Drop files to Attach, or
+                    <span className="text-blue-600 underline">browse</span>
+                  </span>
+                  <div>{file?.name}</div>
+                </span>
+                <input
+                  className="hidden"
+                  type="file"
+                  name="file_upload"
+                  onChange={handleFileChange}
+                  ref={fileRef}
+                />
+              </label>
+            </div>
 
             <div className="rw-button-group">
               <Submit className="bg-supernova w-full rounded-full text-2xl font-handwriting font-bold py-4">

@@ -10,6 +10,7 @@ export const currentUserEvents = () => {
     include: {
       invites: true,
       pairings: true,
+      owner: true,
     },
   })
 }

@@ -10,11 +10,20 @@ export const QUERY = gql`
       id
       name
       date
+      owner {
+        id
+        name
+        avatar
+      }
       invites {
         id
         name
         email
         status
+        user {
+          id
+          avatar
+        }
       }
     }
   }
@@ -89,6 +98,39 @@ export const Success = ({ currentUserEvents }) => {
   }
 
   const timeDiff = calculateWeeksAndDays(currentEvent.date)
+
+  const avatarIcon = (invite) => {
+    if (!invite.user?.avatar) {
+      return statusIcon(invite)
+    }
+
+    let colorClass = ''
+
+    switch (invite.status) {
+      case 'INVITED':
+        colorClass = 'bg-supernova'
+        break
+      case 'ACCEPTED':
+        colorClass = 'bg-spanishGreen'
+        break
+      case 'DECLINED':
+        colorClass = 'bg-orangeRed'
+        break
+    }
+
+    return (
+      <div className="relative inline-block align-middle rounded-full border-4 border-white -ml-6">
+        <img
+          src={invite.user.avatar}
+          alt="avatar"
+          width="80px"
+          height="80px"
+          className="relative inline-block rounded-full"
+        />
+        <div className={`relative inline-block align-middle rounded-full border-4 border-white p-4 -mb-6 -ml-8 ${colorClass}`}></div>
+      </div>
+    )
+  }
 
   const statusIcon = (invite) => {
     switch (invite.status) {
@@ -217,6 +259,24 @@ export const Success = ({ currentUserEvents }) => {
     )
   }
 
+  const profileInfo = () => {
+    return (
+      <div className="flex absolute top-5 right-5 cursor-pointer">
+        <img
+          src={currentEvent.owner.avatar}
+          alt="avatar"
+          width="50px"
+          height="50px"
+          className="rounded-full"
+        />
+        <div className="ml-2">
+          <p className="text-sm">Logged in as</p>
+          <p className="font-bold">{currentEvent.owner.name}</p>
+        </div>
+      </div>
+    )
+  }
+
   const sideMenu = () => {
     if (!showMenu) {
       return
@@ -265,6 +325,7 @@ export const Success = ({ currentUserEvents }) => {
   return (
     <article className="pt-20 p-4 w-full">
       {menuButton()}
+      {profileInfo()}
       {sideMenu()}
       <div className="text-3xl text-white font-handwriting">
         {timeDiff} UNTIL
@@ -309,7 +370,7 @@ export const Success = ({ currentUserEvents }) => {
         {filteredInvites.map((invite) => {
           return (
             <div className="bg-white p-4 m-2" key={invite.id}>
-              {statusIcon(invite)}
+              {avatarIcon(invite)}
 
               <div className="inline-block align-middle px-6 py-1 w-60">
                 <p className="text-2xl font-bold">{invite.name}</p>
