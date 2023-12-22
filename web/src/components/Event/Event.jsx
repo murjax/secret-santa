@@ -55,6 +55,14 @@ const CREATE_INVITE = gql`
   }
 `
 
+const DELETE_INVITE = gql`
+  mutation DeleteInviteMutation($id: Int!) {
+    deleteInvite(id: $id) {
+      id
+    }
+  }
+`
+
 export const INVITES_BY_EVENT_QUERY = gql`
   query GetInvitesByEventQuery($eventId: Int!) {
     invites: invitesByEvent(eventId: $eventId) {
@@ -204,6 +212,11 @@ const Event = ({ event }) => {
   const [currentEvent, setCurrentEvent] = useState(event)
 
   const [createInvite, { loading }] = useMutation(CREATE_INVITE)
+  const [deleteInvite] = useMutation(DELETE_INVITE, {
+    onCompleted: () => {
+      reloadInvitesQuery({ variables: { eventId: currentEvent.id } })
+    },
+  })
   const [getEventById] = useLazyQuery(FIND_EVENT_QUERY)
 
   useQuery(FIND_CURRENT_USER_QUERY, {
@@ -212,6 +225,11 @@ const Event = ({ event }) => {
 
   const invitesQuery = useQuery(INVITES_BY_EVENT_QUERY, {
     variables: { eventId: currentEvent.id },
+    onCompleted: (data) => {
+      setInvites(data.invites)
+    },
+  })
+  const [reloadInvitesQuery] = useLazyQuery(INVITES_BY_EVENT_QUERY, {
     onCompleted: (data) => {
       setInvites(data.invites)
     },
@@ -377,6 +395,12 @@ const Event = ({ event }) => {
         {invites.map((invite) => {
           return (
             <div className="bg-white p-4 m-2 w-2/5" key={invite.id}>
+              <button
+                className="text-right w-full"
+                onClick={() => deleteInvite({ variables: { id: invite.id } })}
+              >
+                X
+              </button>
               <p className="text-2xl font-bold">{invite.name}</p>
               <p>{invite.email}</p>
             </div>
