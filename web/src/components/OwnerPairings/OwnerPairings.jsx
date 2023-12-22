@@ -21,11 +21,13 @@ export const PAIRINGS_BY_EVENT_QUERY = gql`
         id
         name
         email
+        avatar
       }
       person {
         id
         name
         email
+        avatar
       }
     }
   }
@@ -139,6 +141,24 @@ const OwnerPairings = ({ currentEvent }) => {
 
   const timeDiff = calculateWeeksAndDays(currentEvent.date)
 
+  const avatarIcon = (avatar) => {
+    if (!avatar) {
+      return
+    }
+
+    return (
+      <div className="relative inline-block align-middle rounded-full border-4 border-white -ml-6">
+        <img
+          src={avatar}
+          alt="avatar"
+          width="80px"
+          height="80px"
+          className="relative inline-block rounded-full"
+        />
+      </div>
+    )
+  }
+
   return (
     <article className="pt-20 p-4 w-full">
       <div className="text-3xl text-white font-handwriting">
@@ -154,6 +174,7 @@ const OwnerPairings = ({ currentEvent }) => {
           return (
             <div className="flex flex-wrap items-center" key={pairing.id}>
               <div className="bg-white p-4 m-2">
+                {avatarIcon(pairing.santa.avatar)}
                 <div className="inline-block align-middle px-6 py-1 w-60">
                   <p className="text-2xl font-bold">{pairing.santa.name}</p>
                   <p>{pairing.santa.email}</p>
@@ -161,6 +182,7 @@ const OwnerPairings = ({ currentEvent }) => {
               </div>
               <div className="font-6xl text-supernova font-bold">---</div>
               <div className="bg-white p-4 m-2">
+                {avatarIcon(pairing.person.avatar)}
                 <div className="inline-block align-middle px-6 py-1 w-60">
                   <p className="text-2xl font-bold">{pairing.person.name}</p>
                   <p>{pairing.person.email}</p>

@@ -45,11 +45,13 @@ export const EVENT_QUERY = gql`
           id
           name
           email
+          avatar
         }
         person {
           id
           name
           email
+          avatar
         }
       }
     }
@@ -184,9 +186,28 @@ const GuestPairings = () => {
 
   const timeDiff = calculateWeeksAndDays(currentEvent?.date)
 
+  const avatarIcon = (avatar) => {
+    if (!avatar) {
+      return
+    }
+
+    return (
+      <div className="relative inline-block align-middle rounded-full border-4 border-white -ml-6">
+        <img
+          src={avatar}
+          alt="avatar"
+          width="80px"
+          height="80px"
+          className="relative inline-block rounded-full"
+        />
+      </div>
+    )
+  }
+
   const santaRecord = (pairing) => {
     return (
       <div className="bg-white p-4 m-2">
+        {avatarIcon(pairing.santa.avatar)}
         <div className="inline-block align-middle px-6 py-1 w-60">
           <p className="text-2xl font-bold">{pairing.santa.name}</p>
           <p>{pairing.santa.email}</p>
@@ -199,6 +220,7 @@ const GuestPairings = () => {
     if (pairing.santa.id == currentUserId || pairing.person.id == currentUserId) {
       return (
         <div className="bg-white p-4 m-2">
+          {avatarIcon(pairing.santa.avatar)}
           <div className="inline-block align-middle px-6 py-1 w-60">
             <p className="text-2xl font-bold">{pairing.person.name}</p>
             <p>{pairing.person.email}</p>

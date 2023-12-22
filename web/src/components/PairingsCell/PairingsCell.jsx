@@ -21,10 +21,12 @@ export const QUERY = gql`
         santa {
           name
           email
+          avatar
         }
         person {
           name
           email
+          avatar
         }
       }
     }

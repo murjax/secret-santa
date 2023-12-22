@@ -5,6 +5,7 @@ export const schema = gql`
     sendReminder: Boolean!
     date: DateTime!
     ownerId: Int
+    owner: User
     createdAt: DateTime!
     updatedAt: DateTime!
     invites: [Invite]
