@@ -29,6 +29,12 @@ export const deleteThankYou = ({ id }) => {
   })
 }
 
+export const deleteThankYousByEvent = ({ eventId }) => {
+  return db.thankYou.deleteMany({
+    where: { eventId },
+  })
+}
+
 export const ThankYou = {
   event: (_obj, { root }) => {
     return db.thankYou.findUnique({ where: { id: root?.id } }).event()

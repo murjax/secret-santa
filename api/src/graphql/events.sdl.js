@@ -1,6 +1,6 @@
 export const schema = gql`
   type Event {
-    id: Int!
+    id: Int
     name: String!
     sendReminder: Boolean!
     date: DateTime!

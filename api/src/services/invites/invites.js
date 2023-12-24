@@ -41,6 +41,12 @@ export const deleteInvite = ({ id }) => {
   })
 }
 
+export const deleteInvitesByEvent = ({ eventId }) => {
+  return db.invite.deleteMany({
+    where: { eventId },
+  })
+}
+
 export const emailInvite = async ({ id }) => {
   const invite = await db.invite.findUnique({
     where: { id },

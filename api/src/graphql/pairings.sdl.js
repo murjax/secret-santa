@@ -1,6 +1,6 @@
 export const schema = gql`
   type Pairing {
-    id: Int!
+    id: Int
     eventId: Int!
     event: Event!
     santaId: Int!
@@ -37,5 +37,6 @@ export const schema = gql`
     updatePairing(id: Int!, input: UpdatePairingInput!): Pairing! @requireAuth
     deletePairing(id: Int!): Pairing! @requireAuth
     emailPairing(id: Int!): Pairing! @skipAuth
+    deletePairingsByEvent(eventId: Int!): Pairing @requireAuth
   }
 `

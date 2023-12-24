@@ -1,6 +1,6 @@
 export const schema = gql`
   type ThankYou {
-    id: Int!
+    id: Int
     message: String!
     eventId: Int!
     event: Event!
@@ -35,5 +35,6 @@ export const schema = gql`
     updateThankYou(id: Int!, input: UpdateThankYouInput!): ThankYou!
       @requireAuth
     deleteThankYou(id: Int!): ThankYou! @requireAuth
+    deleteThankYousByEvent(eventId: Int!): ThankYou @requireAuth
   }
 `

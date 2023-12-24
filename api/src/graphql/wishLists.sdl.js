@@ -49,6 +49,7 @@ export const schema = gql`
     updateWishList(id: Int!, input: UpdateWishListInput!): WishList!
       @requireAuth
     deleteWishList(id: Int!): WishList! @requireAuth
+    deleteWishListsByEvent(eventId: Int!): WishList @requireAuth
     deleteWishListsByCurrentUser: WishList @requireAuth
   }
 `
