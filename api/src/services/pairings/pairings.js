@@ -65,6 +65,12 @@ export const deletePairing = ({ id }) => {
   })
 }
 
+export const deletePairingsByEvent = ({ eventId }) => {
+  return db.pairing.deleteMany({
+    where: { eventId },
+  })
+}
+
 export const emailPairing = async ({ id }) => {
   const pairing = await db.pairing.findUnique({
     where: { id },

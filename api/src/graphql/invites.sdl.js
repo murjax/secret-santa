@@ -1,6 +1,6 @@
 export const schema = gql`
   type Invite {
-    id: Int!
+    id: Int
     eventId: Int!
     event: Event!
     name: String!
@@ -40,5 +40,6 @@ export const schema = gql`
     updateInvite(id: Int!, input: UpdateInviteInput!): Invite! @skipAuth
     deleteInvite(id: Int!): Invite! @requireAuth
     emailInvite(id: Int!): Invite! @requireAuth
+    deleteInvitesByEvent(eventId: Int!): Invite @requireAuth
   }
 `

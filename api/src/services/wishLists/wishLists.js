@@ -37,6 +37,12 @@ export const deleteWishList = ({ id }) => {
   })
 }
 
+export const deletePairingsByEvent = ({ eventId }) => {
+  return db.wishList.deleteMany({
+    where: { eventId },
+  })
+}
+
 export const deleteWishListsByCurrentUser = () => {
   return db.wishList.deleteMany({
     where: { userId: context.currentUser.id },
